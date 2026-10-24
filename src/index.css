@@ -114,14 +114,24 @@ body {
 .vapi-wrapper,
 .vapi-fab,
 .vapi-is-fab,
+#vapi-support-btn,
+.vapi-btn,
 [class*="vapi"] {
   z-index: 9999 !important;
-}
-
-.vapi-container {
   position: fixed !important;
   bottom: 24px !important;
   right: 24px !important;
   top: auto !important;
   left: auto !important;
+  transform: none !important;
+}
+
+#vapi-support-btn,
+.vapi-btn {
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  top: auto !important;
+  left: auto !important;
+  transform: none !important;
 }
