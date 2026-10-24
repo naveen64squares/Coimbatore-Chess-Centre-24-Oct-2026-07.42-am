@@ -79,10 +79,19 @@ export default function Footer() {
               Visit Us
             </h4>
             <ul className="mt-4 space-y-2.5 text-sm text-ink-300">
-              <li>Coimbatore, Tamil Nadu, India</li>
+              <li>
+                <a href="https://share.google/VnuAFUTGYCrfnunxi" target="_blank" rel="noopener noreferrer" className="hover:text-gold-700 transition-colors">
+                  109, Sri Lakshmi illam, Dr. Alagappa Road, near 6 Corner, Tatabad, Sivanandha Colony, Coimbatore, Tamil Nadu 641012, India
+                </a>
+              </li>
               <li className="pt-2">
                 <a href="https://wa.me/919944898753" target="_blank" rel="noopener noreferrer" className="hover:text-gold-700 transition-colors">
                   +91 99448 98753
+                </a>
+              </li>
+              <li>
+                <a href="tel:+919360287128" className="hover:text-gold-700 transition-colors">
+                  +91 93602 87128
                 </a>
               </li>
               <li>

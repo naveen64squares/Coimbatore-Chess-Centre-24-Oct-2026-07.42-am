@@ -31,8 +31,9 @@ const timeSlotsIst = [
 ];
 
 const contactInfo = [
-  { icon: MapPin, label: 'Visit', value: 'Coimbatore Chess Centre, Coimbatore, Tamil Nadu' },
+  { icon: MapPin, label: 'Visit', value: '109, Sri Lakshmi illam, Dr. Alagappa Road, near 6 Corner, Tatabad, Sivanandha Colony, Coimbatore, Tamil Nadu 641012, India' },
   { icon: Phone, label: 'Call / WhatsApp', value: '+91 99448 98753' },
+  { icon: Phone, label: 'Additional Contact', value: '+91 93602 87128' },
   { icon: Mail, label: 'Email', value: 'coimbatorechesscentre@gmail.com' },
   { icon: Clock, label: 'Offline Class Hours at Our Centre', value: 'Mon–Sat · 05:30 PM – 07:00 PM IST' },
   { icon: Globe, label: 'Online Class Hours', value: 'All 7 days · 04:30 AM – 11:00 PM IST' },
@@ -142,6 +143,15 @@ export default function Contact() {
                 </div>
               </div>
             ))}
+            <a
+              href="https://share.google/VnuAFUTGYCrfnunxi"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 rounded-2xl border border-gold-500/30 bg-gold-500/10 px-5 py-4 font-semibold text-gold-700 hover:bg-gold-500/20 transition-colors"
+            >
+              <MapPin className="h-5 w-5" />
+              Get Directions on Google Maps
+            </a>
             <a
               href={`https://wa.me/${WHATSAPP_NUMBER}`}
               target="_blank"
