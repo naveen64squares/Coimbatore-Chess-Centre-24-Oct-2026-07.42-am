@@ -31,7 +31,7 @@ const timeSlotsIst = [
 ];
 
 const contactInfo = [
-  { icon: MapPin, label: 'Visit', value: '109, Sri Lakshmi illam, Dr. Alagappa Road, near 6 Corner, Tatabad, Sivanandha Colony, Coimbatore, Tamil Nadu 641012, India' },
+  { icon: MapPin, label: 'Visit', value: 'Coimbatore Chess Centre, 109, Dr Alagappa Chettiar Rd, Sivananda Colony, Tatabad, Coimbatore, Tamil Nadu 641012' },
   { icon: Phone, label: 'Call / WhatsApp', value: '+91 99448 98753' },
   { icon: Phone, label: 'Additional Contact', value: '+91 93602 87128' },
   { icon: Mail, label: 'Email', value: 'coimbatorechesscentre@gmail.com' },
@@ -132,6 +132,15 @@ export default function Contact() {
 
         <div className="mt-14 grid lg:grid-cols-5 gap-8">
           <div className="lg:col-span-2 reveal space-y-4">
+            <div className="overflow-hidden rounded-2xl border border-ink-700/60 bg-ink-900/50 shadow-soft">
+              <iframe
+                title="Coimbatore Chess Centre location"
+                src="https://maps.google.com/maps?q=Coimbatore%20Chess%20Centre,%20109,%20Dr%20Alagappa%20Chettiar%20Rd,%20Sivananda%20Colony,%20Tatabad,%20Coimbatore,%20Tamil%20Nadu%20641012&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                className="h-[350px] w-full"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
             {contactInfo.map((c) => (
               <div key={c.label} className="flex items-start gap-4 rounded-2xl border border-ink-700/60 bg-ink-900/50 p-5 hover:border-gold-500/30 transition-colors shadow-soft">
                 <span className="grid place-items-center w-11 h-11 rounded-xl bg-gold-500/15 text-gold-600 border border-gold-500/25 flex-shrink-0">
@@ -144,7 +153,7 @@ export default function Contact() {
               </div>
             ))}
             <a
-              href="https://share.google/VnuAFUTGYCrfnunxi"
+              href="https://www.google.com/maps?kgmid=/g/11gvzct24c&hl=en-IN&daddr=109,+Dr+Alagappa+Chettiar+Rd,+Sivananda+Colony,+Tatabad,+Coimbatore,+Tamil+Nadu+641012"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 rounded-2xl border border-gold-500/30 bg-gold-500/10 px-5 py-4 font-semibold text-gold-700 hover:bg-gold-500/20 transition-colors"
