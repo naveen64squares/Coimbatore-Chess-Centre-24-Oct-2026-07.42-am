@@ -19,6 +19,29 @@
     <script type="module" src="/src/main.tsx"></script>
     <script>
       var vapiInstance = null;
+
+      const getVapiFloatingButton = () => {
+        const button = document.querySelector(
+          '#vapi-support-btn, .vapi-btn, .vapi-fab, button[class*="vapi"], [class*="vapi"] button'
+        );
+        if (button && !button.id) button.id = 'vapi-floating-call-btn';
+        return button;
+      };
+
+      const startVapiVoiceCall = () => {
+        if (vapiInstance && typeof vapiInstance.start === 'function') {
+          vapiInstance.start();
+          return;
+        }
+        getVapiFloatingButton()?.click();
+      };
+
+      window.addEventListener('start-vapi-voice-call', startVapiVoiceCall);
+      new MutationObserver(getVapiFloatingButton).observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
+
       const visitVapi = () => {
         vapiInstance = window.vapiSDK.run({
           apiKey: "d11ecb29-b257-440b-a870-d6a28aecdc49",
@@ -33,6 +56,7 @@
             }
           }
         });
+        getVapiFloatingButton();
       };
 
       const script = document.createElement("script");
