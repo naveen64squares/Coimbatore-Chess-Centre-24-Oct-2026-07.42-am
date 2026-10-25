@@ -8,6 +8,7 @@ import Coaches from '@/components/Coaches';
 import Gallery from '@/components/Gallery';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
+import AIChatbot from '@/components/AIChatbot';
 import { useReveal } from '@/hooks/useReveal';
 import { SettingsProvider } from '@/lib/settings';
 
@@ -29,6 +30,7 @@ function App() {
           <Contact />
         </main>
         <Footer />
+        <AIChatbot />
       </div>
     </SettingsProvider>
   );
