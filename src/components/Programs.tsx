@@ -1,4 +1,4 @@
-import { MapPin, Clock, Globe, Users, Crown, Video, Wifi, PhoneCall } from 'lucide-react';
+import { MapPin, Clock, Globe, Users, Crown, Video, Wifi } from 'lucide-react';
 import { useSettings } from '@/lib/settings';
 import { whatsappBookingUrl } from '@/lib/whatsapp';
 
@@ -129,16 +129,6 @@ export default function Programs() {
                   <span className={`grid place-items-center w-12 h-12 rounded-xl ${f.highlight ? 'bg-gold-400 text-white' : 'bg-gold-500/15 text-gold-600 border border-gold-500/25'}`}>
                     <f.icon className="w-6 h-6" />
                   </span>
-                  <a
-                    href="tel:9360287128"
-                    className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-full border border-gold-500/40 bg-gold-500/10 px-3 py-2 text-xs font-semibold text-gold-600 transition-all duration-300 hover:scale-[1.03] hover:bg-gold-500/20"
-                    aria-label={`Call ${f.name} pricing at 9360287128`}
-                  >
-                    <span className="grid h-6 w-6 place-items-center rounded-full bg-gold-500 text-ink-950">
-                      <PhoneCall className="h-3.5 w-3.5" />
-                    </span>
-                    9360287128
-                  </a>
                 </div>
 
                 <h3 className="mt-5 font-display text-xl font-semibold text-ink-50">{f.name}</h3>
