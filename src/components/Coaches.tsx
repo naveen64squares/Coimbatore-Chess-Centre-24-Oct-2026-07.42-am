@@ -46,7 +46,7 @@ const coaches = [
     rating: 'Peak FIDE 1680',
     title: 'State Arbiter',
     bio: 'International rated player with a peak rating of 1680. University Champion, State Arbiter, Runner-up in the International FIDE Rated event in 2017. 11 years of teaching and playing experience.',
-    img: 'https://static.wixstatic.com/media/9deedb_48f178531b0b430dad0acb838a61d015~mv2.jpeg/v1/crop/x_248,y_0,w_1015,h_1512/fill/w_400,h_500,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/WhatsApp%20Image%202023-03-02%20at%2016_22_34.jpeg',
+    img: '/images/team/Gemini_Generated_Image_g4nsw2g4nsw2g4ns.png',
     badge: null,
   },
   {
