@@ -139,7 +139,9 @@ export default function Programs() {
                     className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-full border border-gold-500/40 bg-gold-500/10 px-3 py-2 text-xs font-semibold text-gold-600 transition-all duration-300 hover:scale-[1.03] hover:bg-gold-500/20"
                     aria-label={`Call for ${f.name} pricing`}
                   >
-                    <PhoneCall className="h-3.5 w-3.5" />
+                    <span className="grid h-6 w-6 place-items-center rounded-full bg-gold-500 text-ink-950">
+                      <PhoneCall className="h-3.5 w-3.5" />
+                    </span>
                     Call for Price
                   </button>
                 </div>
