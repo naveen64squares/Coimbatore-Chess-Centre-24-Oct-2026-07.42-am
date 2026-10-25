@@ -1,6 +1,6 @@
-import { MapPin, Clock, Globe, Users, Crown, Video, Wifi, PhoneCall, MessageCircle } from 'lucide-react';
+import { MapPin, Clock, Globe, Users, Crown, Video, Wifi } from 'lucide-react';
 import { useSettings } from '@/lib/settings';
-import { WHATSAPP_NUMBER } from '@/lib/whatsapp';
+import { whatsappBookingUrl } from '@/lib/whatsapp';
 
 const formats = [
   {
@@ -8,6 +8,8 @@ const formats = [
     icon: MapPin,
     name: 'Offline Classes',
     location: 'Coimbatore Centre',
+    priceInr: 1600,
+    period: '/ month',
     scheduleIst: 'Strictly Mon–Sat · 05:30 PM – 07:00 PM (In-Person)',
     detail: 'Weekly 3 classes · Strictly group format',
     language: 'English & Tamil',
@@ -26,6 +28,8 @@ const formats = [
     icon: Video,
     name: 'Online Group — 8 Students',
     location: 'Live Online',
+    priceInr: 1500,
+    period: '/ month',
     scheduleIst: '05:00 PM – 07:30 PM',
     detail: 'Group of 8 students per batch',
     language: 'Tamil Only',
@@ -45,6 +49,8 @@ const formats = [
     icon: Users,
     name: 'Online Group — 4 Students',
     location: 'Live Online',
+    priceInr: 3500,
+    period: '/ 8 classes',
     scheduleIst: 'Flexible slots · 04:30 AM – 11:00 PM (any 1 hour)',
     detail: 'Matched by playing strength',
     language: 'English & Tamil',
@@ -64,13 +70,15 @@ const formats = [
     icon: Crown,
     name: 'Online Private (1-on-1)',
     location: 'Live Online',
+    priceInr: 6400,
+    period: '/ 8 classes',
     scheduleIst: 'Flexible slots · 04:30 AM – 11:00 PM (any 1 hour)',
     detail: 'Fully personalised coaching',
     language: 'English & Tamil',
     badge: 'Premium',
     features: [
       'One-on-one private coaching',
-      '8 classes per package',
+      '8 classes per package (or USD $75.00)',
       'Flexible slots: 04:30 AM to 11:00 PM IST (any 1 hour, all 7 days)',
       'Customised to local student timezones (US, UK, UAE, SG, IST)',
       'Language: English or Tamil (your choice)',
@@ -81,29 +89,19 @@ const formats = [
 ];
 
 export default function Programs() {
-  const { convertTime, tzLabel } = useSettings();
-
-  function talkToAiAgent() {
-    const vapiButton = document.querySelector<HTMLElement>('#vapi-support-btn, .vapi-fab, .vapi-btn, [class*="vapi"] button');
-    vapiButton?.click();
-  }
-
-  function whatsappPriceUrl(programName: string): string {
-    const message = `Hi Coimbatore Chess Centre, I would like to know the fee structure and batch details for ${programName}.`;
-    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-  }
+  const { formatPrice, convertTime, tzLabel } = useSettings();
 
   return (
     <section id="programs" className="relative py-28 bg-gradient-to-b from-ink-950 to-ink-900">
       <div className="mx-auto max-w-7xl px-6">
         <div className="text-center max-w-2xl mx-auto reveal">
-          <span className="text-xs uppercase tracking-[0.3em] text-gold-600">Class Formats</span>
+          <span className="text-xs uppercase tracking-[0.3em] text-gold-600">Class Formats & Pricing</span>
           <h2 className="mt-4 font-display text-4xl lg:text-5xl font-semibold text-ink-50 text-balance">
-            Flexible formats for every learner
+            Transparent pricing, flexible formats
           </h2>
           <p className="mt-4 text-ink-300">
             Choose the format that fits you — offline at our Coimbatore centre, or online from anywhere.
-            Times shown in your selected timezone ({tzLabel}).
+            Times shown in your selected timezone ({tzLabel}); toggle currency using the switch at the top.
           </p>
         </div>
 
@@ -131,9 +129,12 @@ export default function Programs() {
                   <span className={`grid place-items-center w-12 h-12 rounded-xl ${f.highlight ? 'bg-gold-400 text-white' : 'bg-gold-500/15 text-gold-600 border border-gold-500/25'}`}>
                     <f.icon className="w-6 h-6" />
                   </span>
-                  <span className="rounded-full border border-gold-500/35 bg-gold-500/10 px-3 py-2 text-right text-xs font-semibold text-gold-600">
-                    Talk to Us for Price
-                  </span>
+                  <div className="text-right">
+                    <div className="font-display text-3xl font-semibold gold-gradient-text">
+                      {formatPrice(f.priceInr)}
+                    </div>
+                    <div className="text-xs text-ink-400">{f.period}</div>
+                  </div>
                 </div>
 
                 <h3 className="mt-5 font-display text-xl font-semibold text-ink-50">{f.name}</h3>
@@ -161,29 +162,18 @@ export default function Programs() {
                     </li>
                   ))}
                 </ul>
-                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={talkToAiAgent}
-                    className="inline-flex items-center justify-center gap-2 rounded-full border border-gold-500/40 px-4 py-2.5 text-sm font-semibold text-gold-700 transition-all duration-300 hover:bg-gold-500/10"
-                  >
-                    <PhoneCall className="h-4 w-4" />
-                    Talk to AI Agent
-                  </button>
-                  <a
-                    href={whatsappPriceUrl(f.name)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-all duration-300 ${
-                      f.highlight
-                        ? 'bg-gradient-to-r from-gold-500 to-gold-400 text-white hover:scale-[1.03]'
-                        : 'border border-gold-500/40 text-gold-700 hover:bg-gold-500/10'
-                    }`}
-                  >
-                    <MessageCircle className="h-4 w-4" />
-                    WhatsApp for Price
-                  </a>
-                </div>
+                <a
+                  href={whatsappBookingUrl(`Pricing card — ${f.name}`, f.name)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`mt-6 inline-flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
+                    f.highlight
+                      ? 'bg-gradient-to-r from-gold-500 to-gold-400 text-white hover:scale-[1.03]'
+                      : 'border border-gold-500/40 text-gold-700 hover:bg-gold-500/10'
+                  }`}
+                >
+                  Book on WhatsApp
+                </a>
               </div>
             );
           })}
