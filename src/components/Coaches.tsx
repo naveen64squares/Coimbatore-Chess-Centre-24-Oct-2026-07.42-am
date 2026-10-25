@@ -96,6 +96,16 @@ const coaches = [
     badge: null,
     ctaLabel: 'Book Trial with Coach',
   },
+  {
+    name: 'Coach Kishore Kumar G',
+    role: 'Chess Coach',
+    rating: 'Peak FIDE 1744',
+    title: 'Certified Chess Coach',
+    bio: 'University Champion and 1st-place winner at the South Zone Level-3 Chess Championship. Won the Under-17 District Chess Championship and multiple district and tournament titles. FIDE-rated international tournament player with a peak rating of 1744, and a certified chess coach focused on player development.',
+    img: '/images/team/WhatsApp_Image_2026-10-25_at_10.37.42.jpeg',
+    badge: null,
+    ctaLabel: 'Book Trial with Coach',
+  },
 ];
 
 export default function Coaches() {
