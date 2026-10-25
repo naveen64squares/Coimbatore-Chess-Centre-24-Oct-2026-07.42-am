@@ -2,14 +2,23 @@ import { MapPin, Clock, Globe, Users, Crown, Video, Wifi, PhoneCall } from 'luci
 import { useSettings } from '@/lib/settings';
 import { whatsappBookingUrl } from '@/lib/whatsapp';
 
+const VAPI_DEMO_URL =
+  'https://vapi.ai?demo=true&shareKey=d11ecb29-b257-440b-a870-d6a28aecdc49&assistantId=54c49c5e-fd99-40aa-879f-b6343146595f';
+
 function startVapiCall() {
   const w = window as unknown as { vapiInstance?: { start?: () => void } };
   if (w.vapiInstance?.start) {
     w.vapiInstance.start();
     return;
   }
-  const fab = document.querySelector<HTMLElement>('#vapi-support-btn, .vapi-fab, .vapi-btn, [class*="vapi"] button');
-  fab?.click();
+  const fab =
+    document.getElementById('vapi-support-btn') ||
+    document.querySelector<HTMLElement>('.vapi-btn, .vapi-fab, [class*="vapi"] button');
+  if (fab) {
+    fab.click();
+    return;
+  }
+  window.open(VAPI_DEMO_URL, '_blank', 'noopener,noreferrer');
 }
 
 const formats = [
@@ -142,8 +151,8 @@ export default function Programs() {
                   <button
                     type="button"
                     onClick={startVapiCall}
-                    className="inline-flex items-center justify-center gap-2 rounded-full border border-gold-500/40 bg-gold-500/10 px-3 py-2 text-xs font-semibold text-gold-600 transition-all duration-300 hover:scale-[1.03] hover:bg-gold-500/20"
-                    aria-label={`Call AI assistant for ${f.name} pricing`}
+                    className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-full border border-gold-500/40 bg-gold-500/10 px-3 py-2 text-xs font-semibold text-gold-600 transition-all duration-300 hover:scale-[1.03] hover:bg-gold-500/20"
+                    aria-label={`Call for ${f.name} pricing`}
                   >
                     <PhoneCall className="h-3.5 w-3.5" />
                     Call for Price
