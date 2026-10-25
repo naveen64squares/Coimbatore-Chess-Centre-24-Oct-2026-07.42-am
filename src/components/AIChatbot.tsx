@@ -113,7 +113,7 @@ export default function AIChatbot() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? 'Close AI chat' : 'Open AI chat'}
-        className="fixed right-6 z-[9998] grid h-12 w-12 place-items-center rounded-full border border-gold-500/60 bg-ink-100 text-gold-400 shadow-glow-gold transition-all duration-300 hover:scale-105 hover:border-gold-400"
+        className="fixed left-6 z-[9998] grid h-12 w-12 place-items-center rounded-full border border-gold-500/60 bg-ink-100 text-gold-400 shadow-glow-gold transition-all duration-300 hover:scale-105 hover:border-gold-400"
         style={{ bottom: '96px' }}
       >
         {open ? <X className="h-5 w-5" /> : <MessageCircle className="h-5 w-5" />}
@@ -127,7 +127,7 @@ export default function AIChatbot() {
       {/* Chat window */}
       {open && (
         <div
-          className="fixed right-6 z-[9998] flex h-[480px] w-80 flex-col overflow-hidden rounded-2xl border border-gold-500/40 bg-ink-950 shadow-card sm:w-96"
+          className="fixed left-6 z-[9998] flex h-[480px] w-80 flex-col overflow-hidden rounded-2xl border border-gold-500/40 bg-ink-950 shadow-card sm:w-96"
           style={{ bottom: '160px' }}
         >
           {/* Header */}
