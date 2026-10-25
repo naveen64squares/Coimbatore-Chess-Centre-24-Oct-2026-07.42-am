@@ -20,7 +20,6 @@ const coaches = [
     img: 'https://static.wixstatic.com/media/9deedb_087dd0ff6d8943dcbf415b9ddd9b9400~mv2.jpg/v1/crop/x_190,y_0,w_573,h_810/fill/w_400,h_500,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/WhatsApp%20Image%202023-05-16%20at%2019_edited_j.jpg',
     badge: null,
     available: false,
-    fullPhoto: true,
   },
   {
     name: 'Narendran',
@@ -40,7 +39,6 @@ const coaches = [
     img: 'https://static.wixstatic.com/media/9deedb_54edb97764454347b712b57d6c164a4b~mv2.jpg/v1/crop/x_510,y_0,w_1230,h_1832/fill/w_400,h_500,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/WhatsApp%20Image%202024-03-03%20at%2016_24_edited.jpg',
     badge: null,
     available: false,
-    fullPhoto: true,
   },
   {
     name: 'John Christopher',
@@ -77,7 +75,6 @@ const coaches = [
     bio: 'International rated player with a peak rating of 1532. National Arbiter, University Champion. Represented Coimbatore district in the Tamil Nadu state championship. Won many trophies in state and district level events. 5 years of teaching and playing experience.',
     img: 'https://static.wixstatic.com/media/9deedb_c8b327f0b38f41bf853b814561616bb6~mv2.jpg/v1/crop/x_119,y_0,w_530,h_790/fill/w_400,h_500,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/WhatsApp%20Image%202025-12-01%20at%2008_54_edited.jpg',
     badge: null,
-    fullPhoto: true,
   },
   {
     name: 'Coach Abi',
@@ -134,7 +131,7 @@ export default function Coaches() {
                     src={c.img}
                     alt={c.name}
                     loading="lazy"
-                    className={`w-full h-full ${c.fullPhoto ? 'object-contain bg-ink-900' : 'object-cover object-[center_20%]'} group-hover:scale-105 transition-transform duration-700`}
+                    className="w-full h-full object-cover object-[center_20%] group-hover:scale-105 transition-transform duration-700"
                   />
                 ) : (
                   <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-ink-800 via-ink-900 to-ink-950 text-gold-700">
