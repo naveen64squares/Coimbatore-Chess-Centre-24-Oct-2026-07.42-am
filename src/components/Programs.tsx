@@ -146,7 +146,7 @@ export default function Programs() {
                     aria-label={`Call AI assistant for ${f.name} pricing`}
                   >
                     <PhoneCall className="h-3.5 w-3.5" />
-                    Call AI for Price
+                    Call for Price
                   </button>
                 </div>
 
