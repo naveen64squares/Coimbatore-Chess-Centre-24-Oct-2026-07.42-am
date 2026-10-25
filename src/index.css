@@ -120,9 +120,9 @@ body {
   z-index: 9999 !important;
   position: fixed !important;
   bottom: 24px !important;
-  left: 24px !important;
-  right: auto !important;
+  right: 24px !important;
   top: auto !important;
+  left: auto !important;
   transform: none !important;
 }
 
@@ -130,8 +130,8 @@ body {
 .vapi-btn {
   position: fixed !important;
   bottom: 24px !important;
-  left: 24px !important;
-  right: auto !important;
+  right: 24px !important;
   top: auto !important;
+  left: auto !important;
   transform: none !important;
 }
