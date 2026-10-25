@@ -8,7 +8,7 @@ const coaches = [
     rating: 'Peak FIDE 2069',
     title: 'FIDE Instructor',
     bio: 'International rated player with 24 years of playing and teaching experience. Holds the FIDE Instructor title awarded by the World Chess Federation. Received an award from the Coimbatore District Chess Association for outstanding performance in training kids.',
-    img: 'https://static.wixstatic.com/media/9deedb_f0d5cf8e1552458c800bd4d3b84b2490~mv2.png/v1/crop/x_378,y_0,w_548,h_775/fill/w_400,h_500,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/Untitled.png',
+    img: '/images/team/WhatsApp_Image_2026-10-25_at_10.58.53.jpeg',
     badge: 'Founder',
   },
   {
