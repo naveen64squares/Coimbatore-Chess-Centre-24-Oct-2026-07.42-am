@@ -122,7 +122,15 @@ export default function Gallery() {
       }
       await fetchPhotos();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Upload failed. Please try again.');
+      const msg =
+        err instanceof Error ? err.message : 'Upload failed. Please try again.';
+      const friendly =
+        /failed to fetch|networkrequestfailed|load failed/i.test(msg)
+          ? 'Could not reach the server. Please check your internet connection and try again.'
+          : /storage.*not found|bucket/i.test(msg)
+            ? 'The photo storage is not available. Please contact support.'
+            : msg;
+      alert(friendly);
     } finally {
       setUploading(false);
     }
