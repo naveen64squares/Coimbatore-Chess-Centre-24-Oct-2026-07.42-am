@@ -10,8 +10,6 @@ import {
   Loader2,
   Image as ImageIcon,
   ExternalLink,
-  LayoutGrid,
-  Columns3,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -49,13 +47,12 @@ const labelCls = 'block text-xs uppercase tracking-wider text-ink-300 mb-1.5';
 export default function Gallery() {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
-  const [active, setActive] = useState<number | null>(null);
+  const [current, setCurrent] = useState(0);
   const [adminOpen, setAdminOpen] = useState(false);
   const [editingPhoto, setEditingPhoto] = useState<Photo | null>(null);
   const [isAdmin, setIsAdmin] = useState(() => sessionStorage.getItem(STORAGE_KEY) === '1');
   const [uploading, setUploading] = useState(false);
   const [filter, setFilter] = useState('All');
-  const [layout, setLayout] = useState<'masonry' | 'grid'>('masonry');
 
   const fetchPhotos = useCallback(async () => {
     setLoading(true);
@@ -77,21 +74,27 @@ export default function Gallery() {
       : photos.filter((p) => (p.category || '').toLowerCase() === filter.toLowerCase());
 
   useEffect(() => {
-    if (active === null) return;
+    if (current > filtered.length - 1) setCurrent(Math.max(0, filtered.length - 1));
+  }, [filtered.length, current]);
+
+  const goPrev = useCallback(
+    () => setCurrent((i) => (filtered.length === 0 ? 0 : (i - 1 + filtered.length) % filtered.length)),
+    [filtered.length]
+  );
+  const goNext = useCallback(
+    () => setCurrent((i) => (filtered.length === 0 ? 0 : (i + 1) % filtered.length)),
+    [filtered.length]
+  );
+
+  useEffect(() => {
+    if (filtered.length === 0) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setActive(null);
-      if (e.key === 'ArrowRight')
-        setActive((i) => (i === null ? i : (i + 1) % filtered.length));
-      if (e.key === 'ArrowLeft')
-        setActive((i) => (i === null ? i : (i - 1 + filtered.length) % filtered.length));
+      if (e.key === 'ArrowRight') goNext();
+      if (e.key === 'ArrowLeft') goPrev();
     };
     window.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      window.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
-    };
-  }, [active, filtered.length]);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [goNext, goPrev, filtered.length]);
 
   async function handleUpload(files: FileList, edit: EditData) {
     if (!files || files.length === 0) return;
@@ -169,7 +172,7 @@ export default function Gallery() {
     }
   }
 
-  const current = active !== null ? filtered[active] : null;
+  const photo = filtered.length > 0 ? filtered[current] : null;
 
   return (
     <section id="gallery" className="relative py-28 bg-gradient-to-b from-ink-900 to-ink-950">
@@ -180,8 +183,8 @@ export default function Gallery() {
             Tournaments, trophies & moments
           </h2>
           <p className="mt-4 text-ink-300">
-            A peek into life at the centre — click any photo to open the full-screen
-            viewer and flip through with the arrows or your keyboard.
+            A peek into life at the centre — flip through highlights with the arrows or your
+            keyboard.
           </p>
         </div>
 
@@ -192,7 +195,7 @@ export default function Gallery() {
                 key={f}
                 onClick={() => {
                   setFilter(f);
-                  setActive(null);
+                  setCurrent(0);
                 }}
                 className={`px-4 py-1.5 rounded-full text-sm transition-all duration-300 ${
                   filter === f
@@ -205,34 +208,12 @@ export default function Gallery() {
             ))}
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex rounded-full border border-ink-700/60 p-0.5">
-              <button
-                onClick={() => setLayout('masonry')}
-                className={`grid place-items-center w-8 h-8 rounded-full transition-colors ${
-                  layout === 'masonry' ? 'bg-gold-500/20 text-gold-400' : 'text-ink-400 hover:text-ink-200'
-                }`}
-                title="Masonry layout"
-              >
-                <Columns3 className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setLayout('grid')}
-                className={`grid place-items-center w-8 h-8 rounded-full transition-colors ${
-                  layout === 'grid' ? 'bg-gold-500/20 text-gold-400' : 'text-ink-400 hover:text-ink-200'
-                }`}
-                title="Grid layout"
-              >
-                <LayoutGrid className="w-4 h-4" />
-              </button>
-            </div>
-            <button
-              onClick={() => setAdminOpen(true)}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-ink-700/60 text-ink-300 hover:border-gold-500/40 hover:text-gold-700 text-sm transition-all"
-            >
-              <Plus className="w-4 h-4" /> Admin
-            </button>
-          </div>
+          <button
+            onClick={() => setAdminOpen(true)}
+            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-ink-700/60 text-ink-300 hover:border-gold-500/40 hover:text-gold-700 text-sm transition-all"
+          >
+            <Plus className="w-4 h-4" /> Admin
+          </button>
         </div>
 
         {loading ? (
@@ -244,48 +225,19 @@ export default function Gallery() {
             <ImageIcon className="w-10 h-10 mb-3 opacity-50" />
             <p>No photos in this category yet.</p>
           </div>
-        ) : layout === 'masonry' ? (
-          <div className="mt-10 columns-2 md:columns-3 lg:columns-4 gap-4 [&>*]:mb-4">
-            {filtered.map((p, i) => (
-              <GalleryThumb
-                key={p.id}
-                photo={p}
-                index={i}
-                isAdmin={isAdmin}
-                onClick={() => setActive(i)}
-                onDelete={() => handleDelete(p.id, p.url)}
-                onEdit={() => setEditingPhoto(p)}
-              />
-            ))}
-          </div>
         ) : (
-          <div className="mt-10 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filtered.map((p, i) => (
-              <GalleryThumb
-                key={p.id}
-                photo={p}
-                index={i}
-                isAdmin={isAdmin}
-                square
-                onClick={() => setActive(i)}
-                onDelete={() => handleDelete(p.id, p.url)}
-                onEdit={() => setEditingPhoto(p)}
-              />
-            ))}
-          </div>
+          <FeaturedCarousel
+            photo={photo!}
+            index={current}
+            total={filtered.length}
+            isAdmin={isAdmin}
+            onPrev={goPrev}
+            onNext={goNext}
+            onDelete={() => handleDelete(photo!.id, photo!.url)}
+            onEdit={() => setEditingPhoto(photo!)}
+          />
         )}
       </div>
-
-      {current && (
-        <Lightbox
-          photo={current}
-          index={active!}
-          total={filtered.length}
-          onClose={() => setActive(null)}
-          onPrev={() => setActive((i) => (i === null ? i : (i - 1 + filtered.length) % filtered.length))}
-          onNext={() => setActive((i) => (i === null ? i : (i + 1) % filtered.length))}
-        />
-      )}
 
       {adminOpen && (
         <AdminModal
@@ -314,102 +266,37 @@ export default function Gallery() {
   );
 }
 
-function GalleryThumb({
+function FeaturedCarousel({
   photo,
+  index,
+  total,
   isAdmin,
-  square,
-  onClick,
+  onPrev,
+  onNext,
   onDelete,
   onEdit,
 }: {
   photo: Photo;
   index: number;
+  total: number;
   isAdmin: boolean;
-  square?: boolean;
-  onClick: () => void;
+  onPrev: () => void;
+  onNext: () => void;
   onDelete: () => void;
   onEdit: () => void;
 }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`group relative w-full overflow-hidden rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 shadow-soft ${
-        square ? 'aspect-square' : ''
-      }`}
-    >
-      <img
-        src={photo.url}
-        alt={photo.title || photo.caption || 'Gallery photo'}
-        loading="eager"
-        className={`w-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500 ${
-          square ? 'h-full' : ''
-        }`}
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-ink-950/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
-      {(photo.title || photo.caption) && (
-        <span className="absolute bottom-3 left-3 right-3 text-left text-xs text-ink-100 line-clamp-2">
-          {photo.title || photo.caption}
-        </span>
-      )}
-      {photo.category && (
-        <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-ink-950/70 backdrop-blur-sm text-[10px] uppercase tracking-wider text-gold-300 border border-gold-500/20">
-          {photo.category}
-        </span>
-      )}
-      {photo.link_url && (
-        <span className="absolute top-2 right-2 grid place-items-center w-6 h-6 rounded-full bg-gold-500/80 text-white opacity-0 group-hover:opacity-100 transition-opacity">
-          <ExternalLink className="w-3 h-3" />
-        </span>
-      )}
-      {isAdmin && (
-        <div className="absolute bottom-2 right-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-          <span
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit();
-            }}
-            className="grid place-items-center w-7 h-7 rounded-full bg-ink-800/90 text-gold-300 hover:bg-ink-700"
-            title="Edit photo"
-          >
-            <Pencil className="w-3.5 h-3.5" />
-          </span>
-          <span
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete();
-            }}
-            className="grid place-items-center w-7 h-7 rounded-full bg-red-500/80 text-white hover:bg-red-600"
-            title="Delete photo"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </span>
-        </div>
-      )}
-    </button>
-  );
-}
-
-function Lightbox({
-  photo,
-  index,
-  total,
-  onClose,
-  onPrev,
-  onNext,
-}: {
-  photo: Photo;
-  index: number;
-  total: number;
-  onClose: () => void;
-  onPrev: () => void;
-  onNext: () => void;
-}) {
   const touchStartX = useRef<number | null>(null);
+  const [direction, setDirection] = useState(0);
+  const prevIndex = useRef(index);
+
+  useEffect(() => {
+    setDirection(index > prevIndex.current || (prevIndex.current === total - 1 && index === 0) ? 1 : -1);
+    prevIndex.current = index;
+  }, [index, total]);
 
   return (
     <div
-      className="fixed inset-0 z-[100] bg-ink-950/95 backdrop-blur-md flex items-center justify-center animate-fade-in"
-      onClick={onClose}
+      className="mt-12 select-none"
       onTouchStart={(e) => {
         touchStartX.current = e.touches[0].clientX;
       }}
@@ -421,86 +308,120 @@ function Lightbox({
         touchStartX.current = null;
       }}
     >
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onClose();
-        }}
-        className="absolute top-5 right-5 z-10 grid place-items-center w-11 h-11 rounded-full bg-ink-800/80 text-ink-100 hover:text-gold-300 hover:bg-ink-700 transition-colors"
-        aria-label="Close"
-      >
-        <X className="w-6 h-6" />
-      </button>
+      <div className="relative mx-auto max-w-4xl">
+        <button
+          onClick={onPrev}
+          className="absolute left-0 sm:-left-6 top-1/2 -translate-y-1/2 z-20 grid place-items-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-ink-800/80 text-ink-100 hover:text-gold-300 hover:bg-ink-700 hover:scale-110 transition-all duration-200 shadow-lg"
+          aria-label="Previous photo"
+        >
+          <ChevronLeft className="w-7 h-7 sm:w-8 sm:h-8" />
+        </button>
 
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onPrev();
-        }}
-        className="absolute left-3 sm:left-6 z-10 grid place-items-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-ink-800/80 text-ink-100 hover:text-gold-300 hover:bg-ink-700 hover:scale-110 transition-all duration-200 shadow-lg"
-        aria-label="Previous"
-      >
-        <ChevronLeft className="w-7 h-7 sm:w-8 sm:h-8" />
-      </button>
+        <button
+          onClick={onNext}
+          className="absolute right-0 sm:-right-6 top-1/2 -translate-y-1/2 z-20 grid place-items-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-ink-800/80 text-ink-100 hover:text-gold-300 hover:bg-ink-700 hover:scale-110 transition-all duration-200 shadow-lg"
+          aria-label="Next photo"
+        >
+          <ChevronRight className="w-7 h-7 sm:w-8 sm:h-8" />
+        </button>
 
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onNext();
-        }}
-        className="absolute right-3 sm:right-6 z-10 grid place-items-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-ink-800/80 text-ink-100 hover:text-gold-300 hover:bg-ink-700 hover:scale-110 transition-all duration-200 shadow-lg"
-        aria-label="Next"
-      >
-        <ChevronRight className="w-7 h-7 sm:w-8 sm:h-8" />
-      </button>
+        <figure
+          key={photo.id}
+          className="relative overflow-hidden rounded-2xl border border-gold-500/15 shadow-card bg-ink-950"
+          style={{
+            animation: `${direction >= 0 ? 'slideInRight' : 'slideInLeft'} 0.5s ease-out`,
+          }}
+        >
+          <div className="relative aspect-[16/10] w-full bg-ink-950">
+            <img
+              src={photo.url}
+              alt={photo.title || photo.caption || 'Gallery photo'}
+              loading="eager"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-ink-950/85 via-ink-950/10 to-transparent pointer-events-none" />
 
-      <figure
-        className="max-w-5xl w-full px-16 sm:px-20 flex flex-col items-center"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <img
-          src={photo.url}
-          alt={photo.title || photo.caption || 'Gallery photo'}
-          className="max-w-full max-h-[68vh] object-contain rounded-lg shadow-2xl"
-        />
+            {photo.category && (
+              <span className="absolute top-4 left-4 px-3 py-1 rounded-full bg-ink-950/70 backdrop-blur-sm text-[10px] uppercase tracking-wider text-gold-300 border border-gold-500/20">
+                {photo.category}
+              </span>
+            )}
 
-        <div className="mt-5 w-full max-w-2xl text-center">
-          {photo.category && (
-            <span className="inline-block px-3 py-1 rounded-full bg-gold-500/15 text-gold-300 text-[10px] uppercase tracking-wider border border-gold-500/20 mb-3">
-              {photo.category}
-            </span>
-          )}
-          {photo.title && (
-            <h3 className="font-display text-2xl font-semibold text-ink-50">{photo.title}</h3>
-          )}
-          {photo.description && (
-            <p className="mt-2 text-ink-200 text-sm leading-relaxed">{photo.description}</p>
-          )}
-          {!photo.title && !photo.description && photo.caption && (
-            <p className="mt-2 text-ink-200 text-sm leading-relaxed">{photo.caption}</p>
-          )}
+            {photo.link_url && (
+              <a
+                href={photo.link_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute top-4 right-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold-500/90 text-white text-xs font-semibold hover:bg-gold-500 transition-colors"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+                {photo.link_label || 'View Details'}
+              </a>
+            )}
 
-          {photo.link_url && (
-            <a
-              href={photo.link_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-gold-500 to-gold-400 text-white text-sm font-semibold hover:shadow-glow-gold transition-all"
-            >
-              <ExternalLink className="w-4 h-4" />
-              {photo.link_label || 'View Details'}
-            </a>
-          )}
+            {(photo.title || photo.description || photo.caption) && (
+              <figcaption className="absolute bottom-0 left-0 right-0 p-5 sm:p-7 text-left pointer-events-none">
+                {photo.title && (
+                  <h3 className="font-display text-2xl sm:text-3xl font-semibold text-ink-50">
+                    {photo.title}
+                  </h3>
+                )}
+                {photo.description && (
+                  <p className="mt-2 text-ink-200 text-sm sm:text-base leading-relaxed line-clamp-3">
+                    {photo.description}
+                  </p>
+                )}
+                {!photo.title && !photo.description && photo.caption && (
+                  <p className="text-ink-200 text-sm leading-relaxed">{photo.caption}</p>
+                )}
+              </figcaption>
+            )}
 
-          <div className="mt-4 flex items-center justify-center gap-3 text-xs text-ink-400">
-            <span>
-              {index + 1} / {total}
-            </span>
-            <span className="text-ink-600">|</span>
-            <span className="hidden sm:inline">Use arrow keys to navigate</span>
+            {isAdmin && (
+              <div className="absolute bottom-4 right-4 flex gap-2">
+                <button
+                  onClick={onEdit}
+                  className="grid place-items-center w-9 h-9 rounded-full bg-ink-800/90 text-gold-300 hover:bg-ink-700 transition-colors"
+                  title="Edit photo"
+                >
+                  <Pencil className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={onDelete}
+                  className="grid place-items-center w-9 h-9 rounded-full bg-red-500/80 text-white hover:bg-red-600 transition-colors"
+                  title="Delete photo"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            )}
           </div>
+        </figure>
+
+        <div className="mt-5 flex items-center justify-center gap-3">
+          <button
+            onClick={onPrev}
+            className="grid place-items-center w-9 h-9 rounded-full border border-ink-700/60 text-ink-300 hover:border-gold-500/40 hover:text-gold-700 transition-colors sm:hidden"
+            aria-label="Previous photo"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+
+          <span className="text-sm text-ink-400">
+            <span className="text-gold-400 font-semibold">{index + 1}</span>
+            <span className="text-ink-600"> / </span>
+            {total}
+          </span>
+
+          <button
+            onClick={onNext}
+            className="grid place-items-center w-9 h-9 rounded-full border border-ink-700/60 text-ink-300 hover:border-gold-500/40 hover:text-gold-700 transition-colors sm:hidden"
+            aria-label="Next photo"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
         </div>
-      </figure>
+      </div>
     </div>
   );
 }
@@ -632,7 +553,7 @@ function AdminModal({
                 onChange={(e) => setEdit({ ...edit, description: e.target.value })}
                 className={`${inputCls} resize-none`}
                 rows={2}
-                placeholder="A longer caption shown in the lightbox"
+                placeholder="A longer caption shown with the photo"
               />
             </div>
 
@@ -642,7 +563,7 @@ function AdminModal({
                 value={edit.caption}
                 onChange={(e) => setEdit({ ...edit, caption: e.target.value })}
                 className={inputCls}
-                placeholder="Brief overlay text on the thumbnail"
+                placeholder="Brief overlay text"
               />
             </div>
 
@@ -767,7 +688,7 @@ function EditModal({
               onChange={(e) => setEdit({ ...edit, description: e.target.value })}
               className={`${inputCls} resize-none`}
               rows={2}
-              placeholder="Longer description for the lightbox"
+              placeholder="Longer description for the photo"
             />
           </div>
 
