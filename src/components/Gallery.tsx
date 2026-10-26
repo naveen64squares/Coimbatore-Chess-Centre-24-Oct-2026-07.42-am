@@ -245,7 +245,7 @@ export default function Gallery() {
             <p>No photos in this category yet.</p>
           </div>
         ) : layout === 'masonry' ? (
-          <div className="mt-10 columns-2 md:columns-3 lg:columns-4 gap-4 [&>*]:mb-4 reveal">
+          <div className="mt-10 columns-2 md:columns-3 lg:columns-4 gap-4 [&>*]:mb-4">
             {filtered.map((p, i) => (
               <GalleryThumb
                 key={p.id}
@@ -259,7 +259,7 @@ export default function Gallery() {
             ))}
           </div>
         ) : (
-          <div className="mt-10 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 reveal">
+          <div className="mt-10 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filtered.map((p, i) => (
               <GalleryThumb
                 key={p.id}
@@ -340,7 +340,7 @@ function GalleryThumb({
       <img
         src={photo.url}
         alt={photo.title || photo.caption || 'Gallery photo'}
-        loading="lazy"
+        loading="eager"
         className={`w-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500 ${
           square ? 'h-full' : ''
         }`}
