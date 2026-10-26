@@ -33,7 +33,7 @@ type EditData = {
   link_label: string;
 };
 
-const ADMIN_CODE = 'A2YOrx@1';
+const ADMIN_CODE = 'CXZQu8hs@1';
 const STORAGE_KEY = 'ccc_admin_session';
 
 const CATEGORIES = ['Tournament', 'Trophy', 'Training', 'Event', 'News'];
