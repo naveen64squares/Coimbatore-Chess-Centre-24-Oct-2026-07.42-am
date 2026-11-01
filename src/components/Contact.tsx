@@ -1,6 +1,6 @@
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle2, AlertCircle, ChevronRight, ChevronLeft, User, GraduationCap, Globe, CalendarClock } from 'lucide-react';
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { useSettings } from '@/lib/settings';
 import { WHATSAPP_NUMBER } from '@/lib/whatsapp';
 
@@ -75,19 +75,21 @@ export default function Contact() {
     setStatus('submitting');
     setErrorMsg('');
     try {
-      const { error } = await supabase.from('trial_bookings').insert({
-        student_name: form.studentName.trim(),
-        age: form.age ? parseInt(form.age, 10) : null,
-        level: form.level,
-        format: form.format,
-        language: form.language,
-        time_slot: form.timeSlot,
-        parent_name: form.parentName.trim(),
-        phone: form.phone.trim(),
-        email: form.email.trim(),
-        whatsapp_sent: true,
-      });
-      if (error) throw error;
+      if (supabase) {
+        const { error } = await supabase.from('trial_bookings').insert({
+          student_name: form.studentName.trim(),
+          age: form.age ? parseInt(form.age, 10) : null,
+          level: form.level,
+          format: form.format,
+          language: form.language,
+          time_slot: form.timeSlot,
+          parent_name: form.parentName.trim(),
+          phone: form.phone.trim(),
+          email: form.email.trim(),
+          whatsapp_sent: true,
+        });
+        if (error) throw error;
+      }
 
       const formatLabel = formats.find((f) => f.id === form.format)?.label ?? form.format;
       const message =

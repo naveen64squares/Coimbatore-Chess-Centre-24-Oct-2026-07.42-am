@@ -11,7 +11,7 @@ import {
   Image as ImageIcon,
   ExternalLink,
 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 type Photo = {
   id: string;
@@ -55,6 +55,10 @@ export default function Gallery() {
   const [filter, setFilter] = useState('All');
 
   const fetchPhotos = useCallback(async () => {
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const { data, error } = await supabase
       .from('gallery_photos')
@@ -97,6 +101,10 @@ export default function Gallery() {
   }, [goNext, goPrev, filtered.length]);
 
   async function handleUpload(files: FileList, edit: EditData) {
+    if (!supabase) {
+      alert('Gallery storage is not configured. Please set up Supabase to upload photos.');
+      return;
+    }
     if (!files || files.length === 0) return;
     setUploading(true);
     try {
@@ -140,6 +148,7 @@ export default function Gallery() {
   }
 
   async function handleEdit(id: string, edit: EditData) {
+    if (!supabase) return;
     const { error } = await supabase
       .from('gallery_photos')
       .update({
@@ -159,6 +168,7 @@ export default function Gallery() {
   }
 
   async function handleDelete(id: string, url: string) {
+    if (!supabase) return;
     if (!confirm('Remove this photo?')) return;
     try {
       const match = url.match(/gallery\/(.+)$/);
