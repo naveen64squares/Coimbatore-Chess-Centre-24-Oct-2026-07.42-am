@@ -14,4 +14,8 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+  build: {
+    target: 'es2020',
+    assetsDir: 'assets',
+  },
 });
