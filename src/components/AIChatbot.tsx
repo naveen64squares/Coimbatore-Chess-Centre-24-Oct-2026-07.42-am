@@ -249,7 +249,7 @@ export default function AIChatbot() {
                 onKeyDown={handleKeyDown}
                 placeholder="Type your message…"
                 disabled={loading}
-                className="flex-1 bg-transparent text-sm text-ink-800 placeholder:text-ink-400 focus:outline-none disabled:opacity-60"
+                className="flex-1 bg-transparent text-sm text-ink-50 placeholder:text-ink-400 focus:outline-none disabled:opacity-60"
               />
               <button
                 type="button"
