@@ -9,6 +9,52 @@ const GREETING =
 
 type Message = { role: 'user' | 'ai'; text: string };
 
+const FALLBACK_REPLY = 'Sorry, I didn’t catch that. Could you rephrase?';
+
+const TEXT_KEYS = ['output', 'text', 'response', 'message', 'reply', 'answer'] as const;
+
+function asString(value: unknown): string | null {
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  return null;
+}
+
+function extractFromObject(obj: Record<string, unknown>): string | null {
+  for (const key of TEXT_KEYS) {
+    const v = asString(obj[key]);
+    if (v) return v;
+  }
+  if (typeof obj.data === 'object' && obj.data !== null) {
+    const inner = extractFromObject(obj.data as Record<string, unknown>);
+    if (inner) return inner;
+  }
+  return null;
+}
+
+function extractReply(raw: unknown): string {
+  const str = asString(raw);
+  if (str) return str;
+
+  if (Array.isArray(raw)) {
+    for (const item of raw) {
+      const itemReply = extractReply(item);
+      if (itemReply !== FALLBACK_REPLY) return itemReply;
+    }
+  }
+
+  if (raw && typeof raw === 'object') {
+    const obj = raw as Record<string, unknown>;
+    const direct = extractFromObject(obj);
+    if (direct) return direct;
+    if (obj.json && typeof obj.json === 'object') {
+      const inner = extractFromObject(obj.json as Record<string, unknown>);
+      if (inner) return inner;
+    }
+  }
+
+  return FALLBACK_REPLY;
+}
+
 function getOrCreateSessionId(): string {
   const KEY = 'ccc-ai-session-id';
   try {
@@ -75,15 +121,24 @@ export default function AIChatbot() {
 
       if (!res.ok) throw new Error(`Request failed: ${res.status}`);
 
-      const data = await res.json();
-      const reply =
-        data?.output ||
-        data?.text ||
-        data?.response ||
-        data?.message ||
-        'Sorry, I didn’t catch that. Could you rephrase?';
+      const contentType = res.headers.get('content-type') || '';
+      let raw: unknown = null;
+      if (contentType.includes('application/json')) {
+        raw = await res.json();
+      } else {
+        const text = await res.text();
+        try {
+          raw = JSON.parse(text);
+        } catch {
+          raw = text;
+        }
+      }
 
-      setMessages((prev) => [...prev, { role: 'ai', text: String(reply) }]);
+      const reply = extractReply(raw);
+      setMessages((prev) => [
+        ...prev,
+        { role: 'ai', text: reply },
+      ]);
     } catch {
       setMessages((prev) => [
         ...prev,
