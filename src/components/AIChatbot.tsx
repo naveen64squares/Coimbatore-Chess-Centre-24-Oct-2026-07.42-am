@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { MessageCircle, X, Send } from 'lucide-react';
 
 const WEBHOOK_URL =
-  'https://gecog99982.app.n8n.cloud/webhook/e29f2146-24ca-4f91-95d7-eced516f7be4/chat';
+  'https://gavomim673.app.n8n.cloud/webhook/e29f2146-24ca-4f91-95d7-eced516f7be4/chat';
 
 const GREETING =
   'Hi! Welcome to Coimbatore Chess Centre. How can I help you with our chess coaching programs today?';
