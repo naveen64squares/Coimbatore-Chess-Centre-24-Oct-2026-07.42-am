@@ -65,7 +65,12 @@ export default function Gallery() {
       .select('id, url, caption, title, description, category, link_url, link_label')
       .order('created_at', { ascending: false });
     if (error) {
-      console.error('[Gallery] Fetch photos error:', error);
+      console.error('[Gallery] Fetch photos error:', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+      });
     }
     if (!error && data) setPhotos(data as Photo[]);
     setLoading(false);
