@@ -11,7 +11,7 @@ import {
   Image as ImageIcon,
   ExternalLink,
 } from 'lucide-react';
-import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 
 type Photo = {
   id: string;
@@ -64,6 +64,9 @@ export default function Gallery() {
       .from('gallery_photos')
       .select('id, url, caption, title, description, category, link_url, link_label')
       .order('created_at', { ascending: false });
+    if (error) {
+      console.error('[Gallery] Fetch photos error:', error);
+    }
     if (!error && data) setPhotos(data as Photo[]);
     setLoading(false);
   }, []);
@@ -109,19 +112,32 @@ export default function Gallery() {
     setUploading(true);
     try {
       for (const file of Array.from(files)) {
-        const fileExt = file.name.split('.').pop();
+        const fileExt = file.name.split('.').pop() || 'jpg';
         const fileName = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}.${fileExt}`;
         const filePath = `gallery/${fileName}`;
+        const contentType = file.type || 'image/jpeg';
 
-        const { error: upErr } = await supabase.storage.from('gallery').upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false,
-        });
-        if (upErr) throw upErr;
+        console.log('[Gallery] Uploading file:', { name: file.name, size: file.size, type: contentType, path: filePath, bucket: 'gallery' });
+
+        const { error: upErr } = await supabase.storage
+          .from('gallery')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false,
+            contentType,
+          });
+        if (upErr) {
+          console.error('[Gallery] Storage upload error:', upErr);
+          throw upErr;
+        }
+        console.log('[Gallery] Upload successful, fetching public URL...');
 
         const { data: pub } = supabase.storage.from('gallery').getPublicUrl(filePath);
+        const publicUrl = pub.publicUrl;
+        console.log('[Gallery] Public URL:', publicUrl);
+
         const { error: dbErr } = await supabase.from('gallery_photos').insert({
-          url: pub.publicUrl,
+          url: publicUrl,
           caption: edit.caption || null,
           title: edit.title || null,
           description: edit.description || null,
@@ -129,18 +145,27 @@ export default function Gallery() {
           link_url: edit.link_url || null,
           link_label: edit.link_label || null,
         });
-        if (dbErr) throw dbErr;
+        if (dbErr) {
+          console.error('[Gallery] Database insert error:', dbErr);
+          throw dbErr;
+        }
+        console.log('[Gallery] Database record inserted successfully.');
       }
       await fetchPhotos();
     } catch (err) {
+      console.error('[Gallery] Upload failed:', err);
       const msg =
         err instanceof Error ? err.message : 'Upload failed. Please try again.';
       const friendly =
-        /failed to fetch|networkrequestfailed|load failed/i.test(msg)
+        /failed to fetch|networkrequestfailed|load failed|fetch.*failed/i.test(msg)
           ? 'Could not reach the server. Please check your internet connection and try again.'
           : /storage.*not found|bucket/i.test(msg)
-            ? 'The photo storage is not available. Please contact support.'
-            : msg;
+            ? 'The photo storage bucket is not available. Please contact support.'
+            : /payload too large|413/i.test(msg)
+              ? 'The photo is too large. Please use a smaller image (under 5 MB).'
+              : /row-level security|rls|policy/i.test(msg)
+                ? 'Permission denied — the gallery policies may need updating. Please contact support.'
+                : msg;
       alert(friendly);
     } finally {
       setUploading(false);
@@ -161,6 +186,7 @@ export default function Gallery() {
       })
       .eq('id', id);
     if (error) {
+      console.error('[Gallery] Edit DB error:', error);
       alert(error.message);
       return;
     }
@@ -171,13 +197,15 @@ export default function Gallery() {
     if (!supabase) return;
     if (!confirm('Remove this photo?')) return;
     try {
-      const match = url.match(/gallery\/(.+)$/);
+      const match = url.match(/\/gallery\/(.+)$/);
       if (match) {
         await supabase.storage.from('gallery').remove([`gallery/${match[1]}`]);
       }
-      await supabase.from('gallery_photos').delete().eq('id', id);
+      const { error } = await supabase.from('gallery_photos').delete().eq('id', id);
+      if (error) console.error('[Gallery] Delete DB error:', error);
       setPhotos((prev) => prev.filter((p) => p.id !== id));
     } catch (err) {
+      console.error('[Gallery] Delete failed:', err);
       alert(err instanceof Error ? err.message : 'Could not delete photo.');
     }
   }
